@@ -1,3 +1,5 @@
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +11,7 @@ typedef struct mots{
 	char *mot;
 	int nbOcurrences;
 }mots;
+
 
 int main()
 {
