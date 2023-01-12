@@ -5,13 +5,13 @@
 
 #define MAX_WORDS   1000
 
-typedef struct mots{
-	char *mot;
-	int nbOcurrences;
-}mots;
+
 
 int main()
 {
+	FILE *F;
+
+	F = fopen("test.CIDR", "w");
     FILE *fptr;
     char path[100];
     int i, len, index, isUnique;
@@ -104,14 +104,16 @@ int main()
          * - is used to print string left align inside
          * 15 character width space.
          */
-        printf("%-15s %d\n", words[i], count[i]);
+         fprintf(F,"%d", count[i]);
+         fputs(" ",F);
+        fprintf(F,"%-15s\n", words[i]);
         
         /*
         file *fp;
         fprintf(
         */
     }    
-    
+    fclose(F);
 
     return 0;
 }

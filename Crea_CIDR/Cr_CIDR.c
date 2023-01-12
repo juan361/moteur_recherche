@@ -47,10 +47,14 @@ void Cop_Mot(FILE *F)
 
 	    // Supression des caractères spéciaux 
 
-			while (ispunct(word[strlen(word) - 1]))
-			{
-				word[strlen(word) - 1] = '\0';
-			}
+			 len = strlen(word);
+        
+		if (ispunct(word[len - 1]))
+ 			word[len - 1] = '\0';
+		while (ispunct(word[strlen(word) - 1]))
+		{
+			word[strlen(word) - 1] = '\0';
+		}
 	    // Check si le mot lue est déja présent dans la liste de tous les mots
 
 			isUnique = 1;				//IsUnique = 1 -> le mot est unique , IsUnique = 0 -> le mot esty déja présent
