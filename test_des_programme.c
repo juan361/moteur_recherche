@@ -5,38 +5,45 @@
 
 
 //#define PATH "/home/isen/Algo/MotdeRech/moteur_recherche/textes"
-void filename(char* PATH,)
+char** filename(char* PATH,char FileName[3][20])
 {
 	DIR* dir=opendir(PATH);
-	int i=0,c;
+	int i=0;
+	char * c;
 	if (dir == NULL)
 	{
-		return ;
+		exit(EXIT_FAILURE);
 	}
 	struct dirent* entity;	// on fait appel a la structure présente dans la bibliothèque dirent.h
-	char **FileName = (char**)malloc(sizeof(char *) * 1000);
+	
 	
 	entity = readdir(dir);
 	while (entity != NULL) 
 	{
 		if (entity->d_type==DT_REG)	//DT_REG enum qui réfere au entitée de type fichier
 		{
-			FileName[i] = (char*)malloc(strlen(entity->d_name) + 1);
-			FileName[i] = entity->d_name;
-			printf("%s\n",FileName[i]);
+			//FileName[i] = (char*)malloc(strlen(entity->d_name) + 1);
+			c=entity->d_name;
+			strncpy(FileName[i],c , strlen(c) - 4);
 			i++;
-			c=i;
         	}
 		entity= readdir(dir);
         }
-        puts("ok2");
-        for (i=0;i<=3;i++){free(FileName[i]);}
-        free(FileName);
+       /*for (i=0;i<c;i++)
+        	{free(FileName[i]);}
+        free(FileName);*/
 	closedir(dir);
+	return(FileName);
 }
 
 int main(int argc, char* argv[]) 
 {
-    filename("/home/isen/Algo/MotdeRech/moteur_recherche/textes");
+	//char **FileName = (char**)malloc(sizeof(char *) * 3);
+	char test[3][20];
+    	filename("/home/isen/Algo/MotdeRech/moteur_recherche/textes",test);
+    for (int i=0;i<3;i++)
+    {
+    	printf("%s\n",test[i]);
+    }
     return 0;
 }
