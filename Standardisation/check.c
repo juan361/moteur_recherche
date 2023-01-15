@@ -76,3 +76,27 @@ bool wEqual(const char *word1, const char *word2){
     free(word2S);
     return equal;
 }
+
+int main(int argc, char *argv[]){
+    bool r;
+    char *w1;
+    char *w2;
+    printf("mot 1 \n");
+    scanf("%s", &w1);
+
+    printf("mot 2 \n");
+    scanf("%s", &w2);
+
+    r = wEqual(*w1,*w2);
+    
+
+    if(r==0){
+        printf("false\n");
+    }else if(r==1){
+        printf("true\n");
+    }else{
+        puts("ERROR");
+    }
+
+    return 1;
+}
