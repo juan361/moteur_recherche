@@ -1,13 +1,16 @@
-#include "Standard.h"
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 #define MAX_WORDS   1000
 
-void Cop_Mot(FILE *F)
+void main(void)
 {
 	{
 		char path[100];
 		int i, len, index, isUnique;
+		FILE *F;
 	    
 	    // déclarations liste de mots
 
@@ -88,14 +91,15 @@ void Cop_Mot(FILE *F)
 	    // Close file
 
 	    fclose(F);
-
+	FILE *D=fopen("/home/isen/Algo/MotdeRech/moteur_recherche/textes_CRI/brain.CRI","w");
 
 	    for (i=0; i<index; i++)
 
 	    {
-		printf("%-15s %d\n", words[i], count[i]);
+	    	fprintf(D,"%-15s;%d\n", words[i],count[i]);
 	    }    
-	    return 0;
+	    fclose(D);
+	    return ;
 
 	}
 }
