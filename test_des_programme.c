@@ -41,10 +41,10 @@ char* filename(char* PATH,char FileName[3][20])
 
 void Crea_CIR(char *TxtName)
 {
-	char *docPath = malloc(strlen(TXT_PATH) + strlen(TxtName) + 1);
-	docPath = strcpy(docPath, TXT_PATH);
-	docPath = strcat(docPath, TxtName); 
-	FILE *doc = fopen(docPath, "r");
+	char *TxtPath = malloc(strlen(TXT_PATH) + strlen(TxtName) + 1);
+	TxtPath = strcpy(TxtPath, TXT_PATH);
+	TxtPath = strcat(TxtPath, TxtName); 
+	FILE *doc = fopen(TxtPath, "r");
 	
 	char *CIRPath = malloc(strlen(CRI_PATH) + strlen(TxtName) + 1);
 	if(strstr(TxtName, ".txt") == NULL)
@@ -64,15 +64,17 @@ void Crea_CIR(char *TxtName)
 	//vérifie si le fichier txt c'est bien ouvert
 	if (doc == NULL) 
 	{
-		printf("Error opening document : %s\n", docPath);
+		printf("Error opening document : %s\n", TxtPath);
 		exit(1);
 	}
-	// vérifie si le fichier CRI c'est bien ouvert
+	// vérifie si le fichier CRI c'est bien crée
 	if (index == NULL) 
 	{
 		printf("Error opening/creating index file %s\n", CIRPath);
 		exit(1);
 	}
+	fclose(doc);
+	fclose(index);
 }
 
 int main(int argc, char* argv[]) 
