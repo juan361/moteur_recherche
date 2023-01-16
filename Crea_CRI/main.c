@@ -1,105 +1,28 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
+#include "Cr_CRI.h"
+
+
+#define TXT_PATH "/home/isen/Algo/MotdeRech/moteur_recherche/textes_txt/"
+#define CRI_PATH "/home/isen/Algo/MotdeRech/moteur_recherche/textes_CIR/"
 #define MAX_WORDS   1000
+#define NB_FILE 3
 
-void main(void)
+int main(int argc, char* argv[]) 
 {
+	char test[3][20];
+	filename(TXT_PATH,test);
+	for (int i=0;i<NB_FILE;i++)
 	{
-		char path[100];
-		int i, len, index, isUnique;
-		FILE *F;
-	    
-	    // déclarations liste de mots
-
-		char words[MAX_WORDS][50];
-	    	char word[50];
-
-	    // déclaration de la liste compte mot
-
-		int  count[MAX_WORDS];
-
-	    // récupération du chemin vers le fichier
-
-		printf("quel est le chemin vers le fichier: ");
-		scanf("%s", path);
-
-	    // Ouverture du fichier et vérification 
-
-		F = fopen(path, "r");
-		if (F == NULL)
-		{
-	    		printf("Erreur d'ouverture.\n");
-			exit(EXIT_FAILURE);
-		}
-
-	    // Initialisation du tableau compte mot a 0
-
-		for (i=0; i<MAX_WORDS; i++)
-			count[i] = 0;
-
-		index = 0;
-
-		while (fscanf(F, "%s", word) != EOF)
-		{
-	    // Mettre le mot récupéré en minuscule
-
-			tolower(word);
-
-	    // Supression des caractères spéciaux 
-
-			 len = strlen(word);
-        
-		if (ispunct(word[len - 1]))
- 			word[len - 1] = '\0';
-		while (ispunct(word[strlen(word) - 1]))
-		{
-			word[strlen(word) - 1] = '\0';
-		}
-	    // Check si le mot lue est déja présent dans la liste de tous les mots
-
-			isUnique = 1;				//IsUnique = 1 -> le mot est unique , IsUnique = 0 -> le mot esty déja présent
-			for (i=0; i<index && isUnique; i++)
-			{
-				if (strcmp(words[i], word) == 0)
-				isUnique = 0;
-			}
-
-		// If word is unique then add it to distinct words list
-
-		// and increment index. Otherwise increment occurrence 
-
-		// count of current word.
-
-			if (isUnique) 
-			{
-			    strcpy(words[index], word);
-			    count[index]++;
-
-			    index++;
-			}
-			else
-			{
-			    count[i - 1]++;
-			}
-		}
-
-
-
-	    // Close file
-
-	    fclose(F);
-	FILE *D=fopen("/home/isen/Algo/MotdeRech/moteur_recherche/textes_CRI/brain.CRI","w");
-
-	    for (i=0; i<index; i++)
-
-	    {
-	    	fprintf(D,"%-15s;%d\n", words[i],count[i]);
-	    }    
-	    fclose(D);
-	    return ;
-
+		char *pathcri=CRI_PATH;
+		Crea_CRI(test[i]);
+		
+		strcat(pathcri, test[i]);
+		strcat(pathcri, ".CRI");
+		Fill_Cri(pathcri);
+		
+		printf("%s\n",test[i]);
 	}
+	
+	
+	return 0;
 }

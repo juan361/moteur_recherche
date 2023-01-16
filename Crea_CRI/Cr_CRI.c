@@ -1,12 +1,12 @@
-#include <stdio.h>
-#include <string.h>
-#include <dirent.h>
-#include <stdlib.h>
 
+#include "Cr_CRI.h"
 
 
 #define TXT_PATH "/home/isen/Algo/MotdeRech/moteur_recherche/textes_txt/"
 #define CRI_PATH "/home/isen/Algo/MotdeRech/moteur_recherche/textes_CIR/"
+#define MAX_WORDS   1000
+#define NB_FILE 3
+
 char* filename(char* PATH,char FileName[3][20])
 {
 	DIR* dir=opendir(PATH);
@@ -26,7 +26,8 @@ char* filename(char* PATH,char FileName[3][20])
 		{
 			//FileName[i] = (char*)malloc(strlen(entity->d_name) + 1);
 			c=entity->d_name;
-			strcat(FileName[i],c);
+			strncpy(FileName[i],c, strlen(c) - 4);
+			FileName[i][strlen(c) - 4] = '\0';
 			printf("%s\n",FileName[i]);
 			i++;
         	}
@@ -39,11 +40,12 @@ char* filename(char* PATH,char FileName[3][20])
 	return(FileName);
 }
 
-void Crea_CIR(char *TxtName)
+void Crea_CRI(char *TxtName)
 {
 	char *TxtPath = malloc(strlen(TXT_PATH) + strlen(TxtName) + 1);
 	TxtPath = strcpy(TxtPath, TXT_PATH);
-	TxtPath = strcat(TxtPath, TxtName); 
+	TxtPath = strcat(TxtPath, TxtName);
+	TxtPath = strcat(TxtPath, ".txt");
 	FILE *doc = fopen(TxtPath, "r");
 	
 	char *CIRPath = malloc(strlen(CRI_PATH) + strlen(TxtName) + 1);
@@ -77,17 +79,101 @@ void Crea_CIR(char *TxtName)
 	fclose(index);
 }
 
-int main(int argc, char* argv[]) 
+void Fill_Cri(char path[100])
 {
-	//char **FileName = (char**)malloc(sizeof(char *) * 3);
-	char test[3][20];
-    	filename("/home/isen/Algo/MotdeRech/moteur_recherche/textes_txt",test);
-    for (int i=0;i<3;i++)
-    {
-    	Crea_CIR(test[i]);
-    	printf("%s\n",test[i]);
-    }
+	{
+		int i, len, index, isUnique;
+		FILE *F;
+	    
+	    // déclarations liste de mots
 
-    return 0;
+		char words[MAX_WORDS][50];
+	    	char word[50];
+		
+		char PathTxt[200]=TXT_PATH;
+		strcat(PathTxt,path);
+		strcat(PathTxt,".txt");
+		char* PathCRI[200]=CRI_PATH;
+		strcat(PathCRI,path);
+		strcat(PathCRI,".CRI");
+		
+	    // déclaration de la liste compte mot
+
+		int  count[MAX_WORDS];
+
+	    // Ouverture du fichier et vérification 
+		F = fopen(PathTxt, "r");
+		if (F == NULL)
+		{
+	    		printf("Erreur d'ouverture.\n");
+			exit(EXIT_FAILURE);
+		}
+
+	    // Initialisation du tableau compte mot a 0
+
+		for (i=0; i<MAX_WORDS; i++)
+			count[i] = 0;
+
+		index = 0;
+
+		while (fscanf(F, "%s", word) != EOF)
+		{
+	    // Mettre le mot récupéré en minuscule
+
+			tolower(word);
+
+	    // Supression des caractères spéciaux 
+
+			 len = strlen(word);
+        
+		if (ispunct(word[len - 1]))
+ 			word[len - 1] = '\0';
+		while (ispunct(word[strlen(word) - 1]))
+		{
+			word[strlen(word) - 1] = '\0';
+		}
+	    // Check si le mot lue est déja présent dans la liste de tous les mots
+
+			isUnique = 1;				//IsUnique = 1 -> le mot est unique , IsUnique = 0 -> le mot esty déja présent
+			for (i=0; i<index && isUnique; i++)
+			{
+				if (strcmp(words[i], word) == 0)
+				isUnique = 0;
+			}
+
+		// If word is unique then add it to distinct words list
+
+		// and increment index. Otherwise increment occurrence 
+
+		// count of current word.
+
+			if (isUnique) 
+			{
+			    strcpy(words[index], word);
+			    count[index]++;
+
+			    index++;
+			}
+			else
+			{
+			    count[i - 1]++;
+			}
+		}
+
+
+
+	    // Close file
+
+	    fclose(F);
+	FILE *D=fopen(PathCRI,"w");
+
+	    for (i=0; i<index; i++)
+
+	    {
+	    	fprintf(D,"%-45s%d\n", words[i],count[i]);
+	    }    
+	    fclose(D);
+	    return ;
+
+	}
 }
-
