@@ -3,7 +3,7 @@
 
 
 #define TXT_PATH "/home/isen/Algo/MotdeRech/moteur_recherche/textes_txt/"
-#define CRI_PATH "/home/isen/Algo/MotdeRech/moteur_recherche/textes_CIR/"
+#define CRI_PATH "/home/isen/Algo/MotdeRech/moteur_recherche/textes_CRI/"
 #define MAX_WORDS   1000
 #define NB_FILE 3
 
@@ -28,7 +28,7 @@ char* filename(char* PATH,char FileName[3][20])
 			c=entity->d_name;
 			strncpy(FileName[i],c, strlen(c) - 4);
 			FileName[i][strlen(c) - 4] = '\0';
-			printf("%s\n",FileName[i]);
+			//printf("%s\n",FileName[i]);
 			i++;
         	}
 		entity= readdir(dir);
@@ -93,7 +93,7 @@ void Fill_Cri(char path[100])
 		char PathTxt[200]=TXT_PATH;
 		strcat(PathTxt,path);
 		strcat(PathTxt,".txt");
-		char* PathCRI[200]=CRI_PATH;
+		char PathCRI[200]=CRI_PATH;
 		strcat(PathCRI,path);
 		strcat(PathCRI,".CRI");
 		
