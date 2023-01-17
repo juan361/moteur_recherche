@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
+#include "Standardisation/check.h"
 
 
 int main(){

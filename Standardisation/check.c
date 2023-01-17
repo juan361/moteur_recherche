@@ -3,7 +3,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <errno.h>
-
+#include "check.h"
 #define DOC_PATH "./docs/"
 #define INDEX_PATH "./index/"
 
