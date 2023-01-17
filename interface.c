@@ -22,3 +22,24 @@ int main(){
     printf("vous recherchez %s \nnous rechercherons alors avec le mot %s \n, ou %s", string_scan, string_maj, string_min);
     return 0;
 }
+
+int find_word(int argc, char *argv[]) {
+    char *searchWord = argv[1];
+    char line[256];
+    FILE *file = fopen(argv[2], "r");
+
+    if (file == NULL) {
+        printf("Impossible d'ouvrir le fichier\n");
+        return 1;
+    }
+
+    while (fgets(line, sizeof(line), file)) {
+        if (strstr(line, searchWord)) {
+            printf("Mot trouvé : %s", line);
+        }
+    }
+
+    fclose(file);
+
+    return 0;
+}
