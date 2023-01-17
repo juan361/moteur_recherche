@@ -8,7 +8,7 @@
 #define INDEX_PATH "./index/"
 
 
-__MINGW_EXTENSION typedef unsigned __int64 size_t;
+//__MINGW_EXTENSION typedef unsigned __int64 size_t;
 typedef enum { false, true } bool;
 
 char *toLowerCaseAndRemoveSymbols(const char *word){
@@ -58,29 +58,31 @@ char *englishSing(const char *word) {
 }
 
 
-bool wEqual(const char *word1, const char *word2){
-    char *word1C = malloc(strlen(word1) + 1);
-    char *word2C = malloc(strlen(word2) + 1);
+bool wEqual(char word1[10],char word2[10]){
+
+    char word1C[11];//= malloc(strlen(word1) + 1);
+    char word2C[11];//= malloc(strlen(word2) + 1);
     strcpy(word1C, word1);
     strcpy(word2C, word2);
+
     char *word1L = toLowerCaseAndRemoveSymbols(word1C);
     char *word2L = toLowerCaseAndRemoveSymbols(word2C);
     char *word1S = englishSing(word1C);
     char *word2S = englishSing(word2C);
     bool equal = strcmp(word1S, word2S) == 0;
-    free(word1C);
+   /* free(word1C);
     free(word2C);
     free(word1L);
     free(word2L);
     free(word1S);
-    free(word2S);
+    free(word2S);*/
     return equal;
 }
 
 int main(){
     bool r;
-    char *w1;
-    char *w2;
+    char w1[10];
+    char w2[10];
     printf("mot 1 \n");
     scanf("%s", &w1);
 
@@ -90,7 +92,7 @@ int main(){
     r = wEqual(w1,w2);
     
 
-    if(r){
+    if(r==0){
         printf("false\n");
     }else if(r==1){
         printf("true\n");
