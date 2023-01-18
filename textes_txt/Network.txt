@@ -1,0 +1,10 @@
+Human Networks
+In its broadest sense, a network consists of two or more entities, or objects, sharing resources and information. Although this book is about computer networks, there are networks that don’t involve computers, and those networks are everywhere. You have grown accustomed to working with them, possibly without even knowing it.
+It may not matter to you that, in a basic sense, sharing ( giving or getting) is a fundamental aspect of networking. You just know that you do it.
+
+Family Network
+Most people belong to a family network in which related people share their resources and information. This sharing is bi-directional because even the youngest family members share information of some sort. As the family grows, so does the network.
+Peer Network
+Outside the family, there is a community that offers a wider array of re- sources than the typical family can provide. Naturally, it makes sense to connect the family to this community to take advantage of the wealth of re- sources available around town. This type of information/ resource sharing can be as simple as loaning a hammer to a neighbor, car-pooling with work associates, or helping a friend with his or her homework. All of these activi- ties involve sharing, or trading, resources. This kind of network is represented by a two-way relationship, a give and take among equals or peers.
+Restaurant Network: The Client and the Server
+So, in any type of human network, there’s a lot of giving and taking. You’re already more accustomed to the client/ server perspective in networking than you realize. For instance, when you go to dinner at a restaurant, you be- come a customer, or client, enjoying the food and drink prepared and served to you by the restaurant. On the other hand, the waiter works as a server, controlling and providing his customers with access to resources in the form of placing orders for and delivering food items. The server knows that re- quests will be made of him ( access is sought when an order is placed) and that he will service those making the requests ( access is granted when the order is delivered). 

@@ -4,8 +4,8 @@
 #include <dirent.h>
 #include <errno.h>
 
-#define PATH_TXT "../../textes_txt/"
-#define PATH_CRI "../../textes_CRI/"
+#define PATH_TXT "../textes_txt/"
+#define PATH_CRI "../textes_CRI/"
 
 typedef enum { false, true } bool;
 
@@ -22,13 +22,30 @@ bool containLetters(const char *Mot);
 char *Min_Ponct(const char *Mot);
 char *SingulierTransfo(const char *Mot);
 
+//void Mise_A_Jour();
+
 
 int main(int argc, char *argv[]) {
-    Créa_glob_CRI();
+    //Créa_glob_CRI();
+    printf("File: %s\n", argv[0]);
+    //Mise_A_Jour();
     for(int i = 1; i < argc; i++) {
         Find_glob_Doc(argv[i]);
     }
 }
+/*
+void Mise_A_Jour()
+{
+	FILE *pipe = popen("/tmp/crontab.S4aol3/crontab","w+");
+	if (pipe == NULL) 
+	{
+        perror("popen failed");
+        return;
+        }
+        
+        pclose(pipe);
+}
+*/
 
 /**
  * @brief La fonction Find_glob_Doc prend en paramètre un mot à rechercher, elle ouvre le dossier d'index, lit chaque fichier 

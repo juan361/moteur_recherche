@@ -1,0 +1,2 @@
+I found this project so hard. Even our teacher and the CIN told us that this isn't easy to do.
+The most dificult part was the use of malloc and the pointer even now I don't truly understand how they work
