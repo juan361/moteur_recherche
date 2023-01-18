@@ -38,7 +38,9 @@ int main(int argc, char *argv[]) {
 }
 
 /**
- * @brief Search all documents for a word and print the number of times it appears in each document, sorted by number of times it appears
+ * @brief La fonction searchDocuments prend en paramètre un mot à rechercher, elle ouvre le dossier d'index, lit chaque fichier 
+ * d'index dans le dossier et appelle la fonction searchDocument pour rechercher le mot dans chaque fichier d'index. Elle stocke ensuite le nombre de fois où 
+ * le mot apparaît dans chaque document dans un tableau, trie le tableau en fonction de ce nombre, et imprime les résultats.
  * 
  * @param wordToFind The word to search for
  */
@@ -98,7 +100,9 @@ void searchDocuments(const char *wordToFind){
 }
 
 /**
- * @brief Search a single document for a word and print the number of times it appears in the document
+ * @brief La fonction searchDocument prend en paramètre un mot à rechercher et le nom d'un document, elle ouvre un fichier d'index donné, lit chaque ligne du fichier, 
+ * et utilise la fonction areTwoWordsEqual pour vérifier si le mot recherché est égal à un mot dans la ligne. 
+ * Si c'est le cas, elle incrémente un compteur et retourne le nombre de fois où le mot a été trouvé dans le document.
  * 
  * @param wordToFind The word to search for
  * @param docName The name of the document to search
@@ -141,8 +145,8 @@ int searchDocument(const char *wordToFind, const char *docName){
 
 
 /**
- * @brief For each document in the docs folder, create an index file in the index folder named {FILE}.CRI
- * Every file should contain a list of words and the number of times they appear in the document.
+ * @brief La fonction indexDocuments appelle la fonction indexDocument pour chaque document dans un dossier de documents pour créer des fichiers d'index pour chacun de ces documents.
+ *  Ces fichiers d'index contiennent des mots uniques, convertis en minuscules et en singulier en anglais, pour chaque document.
  */
 void indexDocuments(){
     DIR *dirIndexs = opendir(INDEX_PATH);
@@ -169,7 +173,11 @@ void indexDocuments(){
 }
 
 /**
- * @brief Index a single document and create an index file for it
+ * @brief La fonction indexDocument prend en paramètre le nom d'un document, elle ouvre le document, lit chaque mot dans le document, 
+ * utilise la fonction toLowerCaseAndRemoveSymbols pour convertir le mot en minuscules et enlever les symboles,
+ *  puis utilise la fonction englishSingular pour convertir le mot en singulier en anglais. 
+ * Elle vérifie ensuite si le mot contient des lettres en utilisant la fonction containLetters, 
+ * et si c'est le cas, elle ajoute le mot à un fichier d'index pour ce document.
  * 
  * @param docName The name of the document to index
  */
@@ -280,7 +288,9 @@ void indexDocument(const char *docName)
 }
 
 /**
- * @brief Compare two words and return true if they are equal, ignoring case and plurials
+ * @brief La fonction areTwoWordsEqual prend en paramètre deux mots, elle convertit les deux mots en minuscules, enlève les symboles et vérifie si les deux mots sont égaux. 
+ * Elle retourne true si les deux mots sont égaux, false sinon. 
+ * Elle est utilisée pour vérifier si un mot recherché est présent dans un document.
  * 
  * @param word1
  * @param word2
@@ -313,7 +323,8 @@ bool areTwoWordsEqual(const char *word1, const char *word2){
 
 
 /**
- * @brief Check if a word contains only letters
+ * @brief La fonction containLetters prend en paramètre un mot et vérifie si ce mot contient des lettres. 
+ * Elle retourne true si le mot contient des lettres, false sinon.
  * 
  * @param word 
  * @return true 
@@ -363,7 +374,8 @@ char *toLowerCaseAndRemoveSymbols(const char *word){
 }
 
 /**
- * @brief Convert an enlish word to singular form
+ * @brief La fonction englishSingular prend en paramètre un mot, 
+ * il convertit le mot en singulier en anglais et retourne le mot modifié.
  * 
  * @param word 
  * @return char* 

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "Standardisation/check.h"
+//#include "Standardisation/check.h"
 
 
 int main(){
@@ -23,7 +23,7 @@ int main(){
     return 0;
 }
 
-int find_word(int argc, char *argv[]) {
+/*int find_word(int argc, char *argv[]) {
     char *searchWord = argv[1];
     char line[256];
     FILE *file = fopen(argv[2], "r");
@@ -42,4 +42,4 @@ int find_word(int argc, char *argv[]) {
     fclose(file);
 
     return 0;
-}
+}*/
