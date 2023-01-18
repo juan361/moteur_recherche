@@ -4,71 +4,64 @@
 #include <dirent.h>
 #include <errno.h>
 
-#define DOC_PATH "./docs/"
-#define INDEX_PATH "./index/"
-
-/**
- * @brief CSI3 2023 Assignment
- * @author Tom BOURJALA
- * @org ISEN Méditerranée
- * @date 10/01/2023
- */
+#define PATH_TXT "./docs/"
+#define PATH_CRI "./index/"
 
 typedef enum { false, true } bool;
 
-void indexDocuments();
-void indexDocument(const char *docName);
+void Créa_glob_CRI();
+void Créa_CRI(const char *NomFichier);
 
-void searchDocuments(const char *wordToFind);
-int searchDocument(const char *wordToFind, const char *docName);
+void Find_glob_Doc(const char *MotATrouver);
+int Find_Doc(const char *MotATrouver, const char *NomFichier);
 
-bool areTwoWordsEqual(const char *word1, const char *word2);
-bool fileContainsWord(char *wordToFind, char *filePath);
-bool containLetters(const char *word);
+bool Mot_Egaux(const char *Mot1, const char *Mot2);
+bool fileContainsWord(char *MotATrouver, char *filePath);
+bool containLetters(const char *Mot);
 
-char *toLowerCaseAndRemoveSymbols(const char *word);
-char *englishSingular(const char *word);
+char *Min_Ponct(const char *Mot);
+char *SingulierTransfo(const char *Mot);
 
 
 int main(int argc, char *argv[]) {
-    indexDocuments();
+    Créa_glob_CRI();
     for(int i = 1; i < argc; i++) {
-        searchDocuments(argv[i]);
+        Find_glob_Doc(argv[i]);
     }
 }
 
 /**
- * @brief La fonction searchDocuments prend en paramètre un mot à rechercher, elle ouvre le dossier d'index, lit chaque fichier 
- * d'index dans le dossier et appelle la fonction searchDocument pour rechercher le mot dans chaque fichier d'index. Elle stocke ensuite le nombre de fois où 
+ * @brief La fonction Find_glob_Doc prend en paramètre un mot à rechercher, elle ouvre le dossier d'index, lit chaque fichier 
+ * d'index dans le dossier et appelle la fonction Find_Doc pour rechercher le mot dans chaque fichier d'index. Elle stocke ensuite le nombre de fois où 
  * le mot apparaît dans chaque document dans un tableau, trie le tableau en fonction de ce nombre, et imprime les résultats.
  * 
- * @param wordToFind The word to search for
+ * @param MotATrouver The Mot to search for
  */
-void searchDocuments(const char *wordToFind){
-    DIR *dirIndexs = opendir(INDEX_PATH);
+void Find_glob_Doc(const char *MotATrouver){
+    DIR *DirCRI = opendir(PATH_CRI);
     int *counts = malloc(sizeof(int) * 1000);
-    char **docNames = malloc(sizeof(char *) * 1000);
+    char **NomFichiers = malloc(sizeof(char *) * 1000);
     int documents = 0;
-    if (dirIndexs) {
+    if (DirCRI) {
         struct dirent *ent;
-        while ((ent = readdir(dirIndexs)) != NULL) {
+        while ((ent = readdir(DirCRI)) != NULL) {
             if (ent->d_type == DT_REG) {
-                int count = searchDocument(wordToFind, ent->d_name);
+                int count = Find_Doc(MotATrouver, ent->d_name);
                 if (count > 0) {
                     counts[documents] = count;
-                    docNames[documents] = malloc(strlen(ent->d_name) + 1);
-                    strcpy(docNames[documents], ent->d_name);
+                    NomFichiers[documents] = malloc(strlen(ent->d_name) + 1);
+                    strcpy(NomFichiers[documents], ent->d_name);
                     documents++;
                 }
             }
         }
-        closedir(dirIndexs);
+        closedir(DirCRI);
     } else {
         printf("Error opening index folder %s %d\n", strerror(errno), errno);
         exit(1);
     }
 
-    // Sort the documents by the number of times the word appears in them
+    // Sort the documents by the number of times the Mot appears in them
     for (int i = 0; i < documents; i++) {
         for (int j = i + 1; j < documents; j++) {
             if (counts[i] < counts[j]) {
@@ -76,47 +69,47 @@ void searchDocuments(const char *wordToFind){
                 counts[i] = counts[j];
                 counts[j] = tempCount;
 
-                char *tempDocName = docNames[i];
-                docNames[i] = docNames[j];
-                docNames[j] = tempDocName;
+                char *tempNomFichier = NomFichiers[i];
+                NomFichiers[i] = NomFichiers[j];
+                NomFichiers[j] = tempNomFichier;
             }
         }
     }
 
     // Print the results
-    printf("\n> \"%s\" search results :\n", wordToFind);
+    printf("\n> \"%s\" search results :\n", MotATrouver);
     for (int i = 0; i < documents; i++) {
-        printf("%s : %d\n", docNames[i], counts[i]);
+        printf("%s : %d\n", NomFichiers[i], counts[i]);
     }
     if(documents == 0) {
         printf("No results found\n");
     }
 
     for (int i = 0; i < documents; i++) {
-        free(docNames[i]);
+        free(NomFichiers[i]);
     }
-    free(docNames);
+    free(NomFichiers);
     free(counts);
 }
 
 /**
- * @brief La fonction searchDocument prend en paramètre un mot à rechercher et le nom d'un document, elle ouvre un fichier d'index donné, lit chaque ligne du fichier, 
- * et utilise la fonction areTwoWordsEqual pour vérifier si le mot recherché est égal à un mot dans la ligne. 
+ * @brief La fonction Find_Doc prend en paramètre un mot à rechercher et le nom d'un document, elle ouvre un fichier d'index donné, lit chaque ligne du fichier, 
+ * et utilise la fonction Mot_Egaux pour vérifier si le mot recherché est égal à un mot dans la ligne. 
  * Si c'est le cas, elle incrémente un compteur et retourne le nombre de fois où le mot a été trouvé dans le document.
  * 
- * @param wordToFind The word to search for
- * @param docName The name of the document to search
+ * @param MotATrouver The Mot to search for
+ * @param NomFichier The name of the document to search
  * 
- * @return The number of times the word appears in the document
+ * @return The number of times the Mot appears in the document
  */
-int searchDocument(const char *wordToFind, const char *docName){
-    char *indexPath = malloc(strlen(INDEX_PATH) + strlen(docName) + 1);
-    strcpy(indexPath, INDEX_PATH);
-    strcat(indexPath, docName);
-    FILE *index = fopen(indexPath, "r");
+int Find_Doc(const char *MotATrouver, const char *NomFichier){
+    char *PathCRI = malloc(strlen(PATH_CRI) + strlen(NomFichier) + 1);
+    strcpy(PathCRI, PATH_CRI);
+    strcat(PathCRI, NomFichier);
+    FILE *index = fopen(PathCRI, "r");
 
     if (index == NULL) {
-        printf("Error opening index file %s\n", indexPath);
+        printf("Error opening index file %s\n", PathCRI);
         exit(1);
     }
 
@@ -126,12 +119,12 @@ int searchDocument(const char *wordToFind, const char *docName){
 
     int count = 0;
 
-    // Read each line of the index file and get the count for the word
+    // Read each line of the index file and get the count for the Mot
     while ((read = getline(&line, &len, index)) != -1) {
-        char *word = strtok(line, " ");
+        char *Mot = strtok(line, " ");
         char *countStr = strtok(NULL, " ");
 
-        if (areTwoWordsEqual(word, wordToFind)) {
+        if (Mot_Egaux(Mot, MotATrouver)) {
             count = atoi(countStr);
             break;
         }
@@ -139,30 +132,30 @@ int searchDocument(const char *wordToFind, const char *docName){
 
     fclose(index);
     free(line);
-    free(indexPath);
+    free(PathCRI);
     return count;
 }
 
 
 /**
- * @brief La fonction indexDocuments appelle la fonction indexDocument pour chaque document dans un dossier de documents pour créer des fichiers d'index pour chacun de ces documents.
+ * @brief La fonction Créa_glob_CRI appelle la fonction Créa_CRI pour chaque document dans un dossier de documents pour créer des fichiers d'index pour chacun de ces documents.
  *  Ces fichiers d'index contiennent des mots uniques, convertis en minuscules et en singulier en anglais, pour chaque document.
  */
-void indexDocuments(){
-    DIR *dirIndexs = opendir(INDEX_PATH);
-    if (dirIndexs) {
-        closedir(dirIndexs);
+void Créa_glob_CRI(){
+    DIR *DirCRI = opendir(PATH_CRI);
+    if (DirCRI) {
+        closedir(DirCRI);
     } else {
         printf("Error opening index folder %s %d\n", strerror(errno), errno);
         exit(1);
     }
 
-    DIR *dirDocs = opendir(DOC_PATH);
+    DIR *dirDocs = opendir(PATH_TXT);
     if (dirDocs) {
         struct dirent *ent;
         while ((ent = readdir(dirDocs)) != NULL) {
             if (ent->d_type == DT_REG) {
-                indexDocument(ent->d_name);
+                Créa_CRI(ent->d_name);
             }
         }
         closedir(dirDocs);
@@ -173,45 +166,45 @@ void indexDocuments(){
 }
 
 /**
- * @brief La fonction indexDocument prend en paramètre le nom d'un document, elle ouvre le document, lit chaque mot dans le document, 
- * utilise la fonction toLowerCaseAndRemoveSymbols pour convertir le mot en minuscules et enlever les symboles,
- *  puis utilise la fonction englishSingular pour convertir le mot en singulier en anglais. 
+ * @brief La fonction Créa_CRI prend en paramètre le nom d'un document, elle ouvre le document, lit chaque mot dans le document, 
+ * utilise la fonction Min_Ponct pour convertir le mot en minuscules et enlever les symboles,
+ *  puis utilise la fonction SingulierTransfo pour convertir le mot en singulier en anglais. 
  * Elle vérifie ensuite si le mot contient des lettres en utilisant la fonction containLetters, 
  * et si c'est le cas, elle ajoute le mot à un fichier d'index pour ce document.
  * 
- * @param docName The name of the document to index
+ * @param NomFichier The name of the document to index
  */
-void indexDocument(const char *docName)
+void Créa_CRI(const char *NomFichier)
 {
-    char *docPath = malloc(strlen(DOC_PATH) + strlen(docName) + 1);
-    docPath = strcpy(docPath, DOC_PATH);
-    docPath = strcat(docPath, docName); 
-    FILE *doc = fopen(docPath, "r");
+    char *PathTxt = malloc(strlen(PATH_TXT) + strlen(NomFichier) + 1);
+    PathTxt = strcpy(PathTxt, PATH_TXT);
+    PathTxt = strcat(PathTxt, NomFichier); 
+    FILE *doc = fopen(PathTxt, "r");
     
-    char *indexPath = malloc(strlen(INDEX_PATH) + strlen(docName) + 1);
-    if(strstr(docName, ".txt") == NULL)
+    char *PathCRI = malloc(strlen(PATH_CRI) + strlen(NomFichier) + 1);
+    if(strstr(NomFichier, ".txt") == NULL)
     {
         return;
     }
 
-    char *docNameWithoutExtension = malloc(strlen(docName) - 4 + 1);
-    strncpy(docNameWithoutExtension, docName, strlen(docName) - 4);
-    docNameWithoutExtension[strlen(docName) - 4] = '\0';
+    char *NomSansExtention = malloc(strlen(NomFichier) - 4 + 1);
+    strncpy(NomSansExtention, NomFichier, strlen(NomFichier) - 4);
+    NomSansExtention[strlen(NomFichier) - 4] = '\0';
 
-    strcpy(indexPath, INDEX_PATH);
-    strcat(indexPath, docNameWithoutExtension);
-    strcat(indexPath, ".CRI");
-    FILE *index = fopen(indexPath, "w");
+    strcpy(PathCRI, PATH_CRI);
+    strcat(PathCRI, NomSansExtention);
+    strcat(PathCRI, ".CRI");
+    FILE *index = fopen(PathCRI, "w");
 
     if (doc == NULL) 
     {
-        printf("Error opening document : %s\n", docPath);
+        printf("Error opening document : %s\n", PathTxt);
         exit(1);
     }
 
     if (index == NULL) 
     {
-        printf("Error opening/creating index file %s\n", indexPath);
+        printf("Error opening/creating index file %s\n", PathCRI);
         exit(1);
     }
 
@@ -219,104 +212,104 @@ void indexDocument(const char *docName)
     size_t len = 0;
     size_t read;
 
-    char **words = malloc(sizeof(char *) * 1000);
-    int *wordsIterate = malloc(sizeof(int) * 1000);
+    char **Mots = malloc(sizeof(char *) * 1000);
+    int *Ocu_Mot = malloc(sizeof(int) * 1000);
     int wordCount = 0;
 
-    // Read each line of the document and get each unique word
+    // Read each line of the document and get each unique Mot
     while ((read = getline(&line, &len, doc)) != -1) 
     {
-        char *word = strtok(line, " ");
-        while (word != NULL) 
+        char *Mot = strtok(line, " ");
+        while (Mot != NULL) 
         {
-            char *wordLower = toLowerCaseAndRemoveSymbols(word);
-            char *wordSingular = englishSingular(wordLower);
+            char *wordLower = Min_Ponct(Mot);
+            char *MotSingulier = SingulierTransfo(wordLower);
             
-            if(!containLetters(wordSingular))
+            if(!containLetters(MotSingulier))
             {
                 break;
             }
 
-            bool wordExists = false;
+            bool MotExiste = false;
             for (int i = 0; i < wordCount; i++) 
            {
-                if (areTwoWordsEqual(wordSingular, words[i])) 
+                if (Mot_Egaux(MotSingulier, Mots[i])) 
                 {
-                    wordsIterate[i]++;
-                    wordExists = true;
+                    Ocu_Mot[i]++;
+                    MotExiste = true;
                     break;
                 }
             }
 
-            if (!wordExists) 
+            if (!MotExiste) 
            {
-                char *wordCopy = malloc(strlen(wordSingular) + 1);
-                strcpy(wordCopy, wordSingular);
-                words[wordCount] = wordCopy;
-                wordsIterate[wordCount] = 1;
+                char *CopieMot = malloc(strlen(MotSingulier) + 1);
+                strcpy(CopieMot, MotSingulier);
+                Mots[wordCount] = CopieMot;
+                Ocu_Mot[wordCount] = 1;
                 wordCount++;
                 if(wordCount % 1000 == 0)
                 {
-                    words = realloc(words, sizeof(char *) * (wordCount + 1000));
-                    wordsIterate = realloc(wordsIterate, sizeof(int) * (wordCount + 1000));
+                    Mots = realloc(Mots, sizeof(char *) * (wordCount + 1000));
+                    Ocu_Mot = realloc(Ocu_Mot, sizeof(int) * (wordCount + 1000));
                 }
             }
 
-            word = strtok(NULL, " ");
+            Mot = strtok(NULL, " ");
             free(wordLower);
-            free(wordSingular);
+            free(MotSingulier);
         }
     }
 
-    // Write each word and the number of times it appears in the document to the index file
+    // Write each Mot and the number of times it appears in the document to the index file
     for (int i = 0; i < wordCount; i++) 
     {
-        fprintf(index, "%s %d\n", words[i], wordsIterate[i]);
+        fprintf(index, "%s %d\n", Mots[i], Ocu_Mot[i]);
     }
 
     fclose(doc);
     fclose(index);
     for(int i = 0; i < wordCount; i++)
     {
-        free(words[i]);
+        free(Mots[i]);
     }
 
-    free(words);
-    free(wordsIterate);
+    free(Mots);
+    free(Ocu_Mot);
     free(line);
-    free(indexPath);
+    free(PathCRI);
 }
 
 /**
- * @brief La fonction areTwoWordsEqual prend en paramètre deux mots, elle convertit les deux mots en minuscules, enlève les symboles et vérifie si les deux mots sont égaux. 
+ * @brief La fonction Mot_Egaux prend en paramètre deux mots, elle convertit les deux mots en minuscules, enlève les symboles et vérifie si les deux mots sont égaux. 
  * Elle retourne true si les deux mots sont égaux, false sinon. 
  * Elle est utilisée pour vérifier si un mot recherché est présent dans un document.
  * 
- * @param word1
- * @param word2
+ * @param Mot1
+ * @param Mot2
  * @return true if equal
  * @return false if not equal
  */
-bool areTwoWordsEqual(const char *word1, const char *word2){
-    char *word1Copy = malloc(strlen(word1) + 1);
-    char *word2Copy = malloc(strlen(word2) + 1);
-    strcpy(word1Copy, word1);
-    strcpy(word2Copy, word2);
+bool Mot_Egaux(const char *Mot1, const char *Mot2){
+    char *CopieMot1 = malloc(strlen(Mot1) + 1);
+    char *CopieMot2 = malloc(strlen(Mot2) + 1);
+    strcpy(CopieMot1, Mot1);
+    strcpy(CopieMot2, Mot2);
 
-    char *word1Lower = toLowerCaseAndRemoveSymbols(word1Copy);
-    char *word2Lower = toLowerCaseAndRemoveSymbols(word2Copy);
+    char *Mot1Minu = Min_Ponct(CopieMot1);
+    char *Mot2Minu = Min_Ponct(CopieMot2);
 
-    char *word1Singular = englishSingular(word1Lower);
-    char *word2Singular = englishSingular(word2Lower);
+    char *Mot1Singulier = SingulierTransfo(Mot1Minu);
+    char *Mot2Singulier = SingulierTransfo(Mot2Minu);
 
-    bool areEqual = strcmp(word1Singular, word2Singular) == 0;
+    bool areEqual = strcmp(Mot1Singulier, Mot2Singulier) == 0;
 
-    free(word1Copy);
-    free(word2Copy);
-    free(word1Lower);
-    free(word2Lower);
-    free(word1Singular);
-    free(word2Singular);
+    free(CopieMot1);
+    free(CopieMot2);
+    free(Mot1Minu);
+    free(Mot2Minu);
+    free(Mot1Singulier);
+    free(Mot2Singulier);
     
     return areEqual;
 }
@@ -326,17 +319,17 @@ bool areTwoWordsEqual(const char *word1, const char *word2){
  * @brief La fonction containLetters prend en paramètre un mot et vérifie si ce mot contient des lettres. 
  * Elle retourne true si le mot contient des lettres, false sinon.
  * 
- * @param word 
+ * @param Mot 
  * @return true 
  * @return false 
  */
-bool containLetters(const char *word){
+bool containLetters(const char *Mot){
     bool onlyLetters = true;
-    if(strlen(word) == 0){
+    if(strlen(Mot) == 0){
         return false;
     }
-    for(size_t i = 0; i < strlen(word); i++){
-        if(!(word[i] >= 'a' && word[i] <= 'z') && !(word[i] >= 'A' && word[i] <= 'Z') && word[i] != '-'){
+    for(size_t i = 0; i < strlen(Mot); i++){
+        if(!(Mot[i] >= 'a' && Mot[i] <= 'z') && !(Mot[i] >= 'A' && Mot[i] <= 'Z') && Mot[i] != '-'){
             onlyLetters = false;
         }
     }
@@ -344,60 +337,60 @@ bool containLetters(const char *word){
 }
 
 /**
- * @brief Convert a word to lower case and remove symbols
+ * @brief Convert a Mot to lower case and remove symbols
  * 
- * @param word 
+ * @param Mot 
  * @return char*
  */
-char *toLowerCaseAndRemoveSymbols(const char *word){
-    size_t len = strlen(word);
-    char *lowerCaseWord = (char *) malloc(len + 1);
+char *Min_Ponct(const char *Mot){
+    size_t len = strlen(Mot);
+    char *MotMinuscule = (char *) malloc(len + 1);
 
     for (size_t i = 0; i < len; i++)
     {
-        if(word[i] >= 'A' && word[i] <= 'Z'){
-            lowerCaseWord[i] = word[i] + 32;
+        if(Mot[i] >= 'A' && Mot[i] <= 'Z'){
+            MotMinuscule[i] = Mot[i] + 32;
         } else {
-            lowerCaseWord[i] = word[i];
+            MotMinuscule[i] = Mot[i];
         }
     }
-    lowerCaseWord[len] = '\0';
+    MotMinuscule[len] = '\0';
 
     for(size_t i = 0; i < len; i++){
-        if (lowerCaseWord[i] == '.' || lowerCaseWord[i] == ',' || lowerCaseWord[i] == ';' || lowerCaseWord[i] == ':' || lowerCaseWord[i] == '!' || lowerCaseWord[i] == '?' || lowerCaseWord[i] == '"' || lowerCaseWord[i] == '(' || lowerCaseWord[i] == ')' || lowerCaseWord[i] == '\'' || lowerCaseWord[i] == '\n'){
-            lowerCaseWord[i] = '\0';
+        if (MotMinuscule[i] == '.' || MotMinuscule[i] == ',' || MotMinuscule[i] == ';' || MotMinuscule[i] == ':' || MotMinuscule[i] == '!' || MotMinuscule[i] == '?' || MotMinuscule[i] == '"' || MotMinuscule[i] == '(' || MotMinuscule[i] == ')' || MotMinuscule[i] == '\'' || MotMinuscule[i] == '\n'){
+            MotMinuscule[i] = '\0';
             break;
         }
     }
 
-    return lowerCaseWord;
+    return MotMinuscule;
 }
 
 /**
- * @brief La fonction englishSingular prend en paramètre un mot, 
+ * @brief La fonction SingulierTransfo prend en paramètre un mot, 
  * il convertit le mot en singulier en anglais et retourne le mot modifié.
  * 
- * @param word 
+ * @param Mot 
  * @return char* 
  */
-char *englishSingular(const char *word) {
-    size_t len = strlen(word);
-    char *singular = (char *) malloc(len + 1);
-    if (len > 2 && word[len - 1] == 's') {
+char *SingulierTransfo(const char *Mot) {
+    size_t len = strlen(Mot);
+    char *Singulier = (char *) malloc(len + 1);
+    if (len > 2 && Mot[len - 1] == 's') {
         if(
-            (word[len - 2] == 'e' && word[len - 3] == 'i')
-            || (word[len - 2] == 'a')
+            (Mot[len - 2] == 'e' && Mot[len - 3] == 'i')
+            || (Mot[len - 2] == 'a')
         ){
-            // word is already in singular form
-            strcpy(singular, word);
+            // Mot is already in Singulier form
+            strcpy(Singulier, Mot);
         } else {
-            strncpy(singular, word, len - 1);
-            singular[len - 1] = '\0';
+            strncpy(Singulier, Mot, len - 1);
+            Singulier[len - 1] = '\0';
         }
     } else {
-        //word is already in singular form
-        strcpy(singular, word);
+        //Mot is already in Singulier form
+        strcpy(Singulier, Mot);
     }
 
-    return singular;
+    return Singulier;
 }
