@@ -3,7 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-//#include "Standardisation/check.h"
+#include "./Check_mot/check.h"
+
+#define INDEX_PATH "./textes_CRI/"
+
 
 
 int main(){
@@ -21,6 +24,11 @@ int main(){
 
     printf("vous recherchez %s \nnous rechercherons alors avec le mot %s \n, ou %s", string_scan, string_maj, string_min);
     return 0;
+}
+
+void searchWords(const char *word){
+    
+
 }
 
 /*int find_word(int argc, char *argv[]) {
