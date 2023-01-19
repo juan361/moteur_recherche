@@ -7,7 +7,8 @@
 #include <dirent.h>
 #include <errno.h>
 #include <ctype.h>
-
+#include <stdio.h>
+#include <unistd.h>
 
 #define PATH_TXT "./textes_txt/"
 #define PATH_CRI "./textes_CRI/"

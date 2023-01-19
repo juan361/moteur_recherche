@@ -75,7 +75,7 @@ int Find_Doc(const char *MotATrouver, const char *NomFichier){
     FILE *index = fopen(PathCRI, "r");
 
     if (index == NULL) {
-        printf("Error opening index file %s\n", PathCRI);
+        printf("Erreur d'ouverture du fichier CRI %s\n", PathCRI);
         exit(1);
     }
 
@@ -85,7 +85,7 @@ int Find_Doc(const char *MotATrouver, const char *NomFichier){
 
     int count = 0;
     
-    //Lie chauque ligne du CRI pour récupérer l'occurance du mot
+    //Lis chaque ligne du CRI pour récupérer l'occurence du mot
     while ((read = getline(&line, &len, index)) != -1) {
         char *Mot = strtok(line, " ");
         char *countStr = strtok(NULL, " ");
@@ -104,7 +104,9 @@ int Find_Doc(const char *MotATrouver, const char *NomFichier){
 
 
 
-void Créa_glob_CRI(){
+void Créa_glob_CRI()
+{
+	//teste l'ouverture des dossier
     DIR *DirCRI = opendir(PATH_CRI);
     if (DirCRI)
     {
@@ -119,7 +121,7 @@ void Créa_glob_CRI(){
     DIR *dirDocs = opendir(PATH_TXT);
     if (dirDocs) 
     {
-        struct dirent *ent;
+        struct dirent *ent;// srtucture de gestion de dossier
         while ((ent = readdir(dirDocs)) != NULL)
         {
             if (ent->d_type == DT_REG)
@@ -139,17 +141,18 @@ void Créa_glob_CRI(){
 
 void Créa_CRI(const char *NomFichier)
 {
+	//gere l'ouverture du fichier .txt
     char *PathTxt = malloc(strlen(PATH_TXT) + strlen(NomFichier) + 1);
-    PathTxt = strcpy(PathTxt, PATH_TXT);
-    PathTxt = strcat(PathTxt, NomFichier); 
+    strcpy(PathTxt, PATH_TXT);
+    strcat(PathTxt, NomFichier); 
     FILE *doc = fopen(PathTxt, "r");
     
     char *PathCRI = malloc(strlen(PATH_CRI) + strlen(NomFichier) + 1);
-    if(strstr(NomFichier, ".txt") == NULL)
+    if(strstr(NomFichier, ".txt") == NULL) //cherche la première occurence de .txt dans NomFichier
     {
         return;
     }
-
+	//gere l'ouverture du fichier .CRI
     char *NomSansExtention = malloc(strlen(NomFichier) - 4 + 1);
     strncpy(NomSansExtention, NomFichier, strlen(NomFichier) - 4);
     NomSansExtention[strlen(NomFichier) - 4] = '\0';
@@ -158,7 +161,7 @@ void Créa_CRI(const char *NomFichier)
     strcat(PathCRI, NomSansExtention);
     strcat(PathCRI, ".CRI");
     FILE *index = fopen(PathCRI, "w");
-
+	//vérif que ouverture correcte
     if (doc == NULL) 
     {
         printf("Erreur d'ouverture du document : %s\n", PathTxt);
@@ -179,10 +182,10 @@ void Créa_CRI(const char *NomFichier)
     int *Ocu_Mot = malloc(sizeof(int) * 1000);
     int wordCount = 0;
 
-    // Read each line of the document and get each unique Mot
+    //Lis chaque ligne du document et récupère chaque mot
     while ((read = getline(&line, &len, doc)) != -1) 
     {
-        char *Mot = strtok(line, " ");
+        char *Mot = strtok(line, " ");// créer une sous liste de caratère a chaque espace
         while (Mot != NULL) 
         {
             char *wordLower = transformer_en_minuscule_sans_ponctuation(Mot);
@@ -191,6 +194,7 @@ void Créa_CRI(const char *NomFichier)
             if(!hasOnlyLetters(MotSingulier))
             {
                 break;
+                //s'il y a des caractère spéciaux on passe au mot d'après
             }
 
             bool MotExiste = false;
@@ -198,13 +202,14 @@ void Créa_CRI(const char *NomFichier)
            {
                 if (Mot_Egaux(MotSingulier, Mots[i])) 
                 {
+                // Si on retrouve le même mot on augmante l'occurence
                     Ocu_Mot[i]++;
                     MotExiste = true;
                     break;
                 }
             }
 
-            if (!MotExiste) 
+            if (!MotExiste) //si le mot n'est pas déjà écrit dans le fichier on l'écrit
            {
                 char *CopieMot = malloc(strlen(MotSingulier) + 1);
                 strcpy(CopieMot, MotSingulier);
@@ -213,18 +218,19 @@ void Créa_CRI(const char *NomFichier)
                 wordCount++;
                 if(wordCount % 1000 == 0)
                 {
+                //si on a rempli le tableau de mots on réalloue de la mémoire
                     Mots = realloc(Mots, sizeof(char *) * (wordCount + 1000));
                     Ocu_Mot = realloc(Ocu_Mot, sizeof(int) * (wordCount + 1000));
                 }
             }
 
-            Mot = strtok(NULL, " ");
-            free(wordLower);
+            Mot = strtok(NULL, " "); //termine strtok
+            free(wordLower);		
             free(MotSingulier);
         }
     }
 
-    // Write each Mot and the number of times it appears in the document to the index file
+    //On écrit chaque mot et leurs nbs d'occurences dans le fichier CRI
     for (int i = 0; i < wordCount; i++) 
     {
         fprintf(index, "%s %d\n", Mots[i], Ocu_Mot[i]);
@@ -243,22 +249,17 @@ void Créa_CRI(const char *NomFichier)
     free(PathCRI);
 }
 
-bool Mot_Egaux(const char *Mot1, const char *Mot2){
-    char *CopieMot1 = malloc(strlen(Mot1) + 1);
-    char *CopieMot2 = malloc(strlen(Mot2) + 1);
-    strcpy(CopieMot1, Mot1);
-    strcpy(CopieMot2, Mot2);
-
-    char *Mot1Minu = transformer_en_minuscule_sans_ponctuation(CopieMot1);
-    char *Mot2Minu = transformer_en_minuscule_sans_ponctuation(CopieMot2);
+bool Mot_Egaux(const char *Mot1, const char *Mot2)
+{
+    char *Mot1Minu = transformer_en_minuscule_sans_ponctuation(Mot1);
+    char *Mot2Minu = transformer_en_minuscule_sans_ponctuation(Mot2);
 
     char *Mot1Singulier = SingulierTransfo(Mot1Minu);
     char *Mot2Singulier = SingulierTransfo(Mot2Minu);
 
     bool areEqual = strcmp(Mot1Singulier, Mot2Singulier) == 0;
 
-    free(CopieMot1);
-    free(CopieMot2);
+	//libère les espace des malloc
     free(Mot1Minu);
     free(Mot2Minu);
     free(Mot1Singulier);
@@ -269,9 +270,9 @@ bool Mot_Egaux(const char *Mot1, const char *Mot2){
 
 bool hasOnlyLetters(const char *word) 
 {
-    for (size_t i = 0; i < strlen(word); i++) 
+    for (int i = 0; i < strlen(word); i++) 
     {
-        if (!isalpha(word[i]) && word[i] != '-') 
+        if (!isalpha(word[i]) && word[i] != '-') /* isalpha vérifie si word[i] est une lettre ou un - */
         {
             return false;
         }
@@ -279,30 +280,50 @@ bool hasOnlyLetters(const char *word)
     return true;
 }
 
-char *transformer_en_minuscule_sans_ponctuation(const char *Mot) {
-    size_t len = strlen(Mot);
-    char *MotMinuscule = (char *) malloc(len + 1);
-
-    for (size_t i = 0; i < len; i++) {
-        if (Mot[i] >= 'A' && Mot[i] <= 'Z') {
+char *transformer_en_minuscule_sans_ponctuation(const char *Mot) 
+{
+    char *MotMinuscule = (char *) malloc(strlen(Mot) + 1);
+    for (int i = 0; i < strlen(Mot); i++) 
+    {
+    	//si Mot[i] est compris entre A et Z
+        if (Mot[i] >= 'A' && Mot[i] <= 'Z') 
+        {
+        // On rajoute 32 a son code ASCI ce qui veut dire quon les fait passer en minuscule
             MotMinuscule[i] = Mot[i] + 32;
-        } else if (Mot[i] >= 'a' && Mot[i] <= 'z') {
+        }
+        else if (Mot[i] >= 'a' && Mot[i] <= 'z') 
+        {
             MotMinuscule[i] = Mot[i];
-        } else {
+        } 
+        else 
+        {
+        // Si Mot[i] n'est pas une lettre je le remplace par un \0 
             MotMinuscule[i] = '\0';
             break;
         }
     }
-    MotMinuscule[len] = '\0';
+    MotMinuscule[strlen(Mot)] = '\0';
 
     return MotMinuscule;
 }
 
-char *SingulierTransfo(const char *Mot) {
+char *SingulierTransfo(const char *Mot) 
+{
     char *Singulier;
-    if(Mot[strlen(Mot) -1] == 's') {
-        Singulier = strndup(Mot, strlen(Mot) -1);
-    } else {
+    // vas regarder si le mot finis par un s 
+    if(Mot[strlen(Mot) -1] == 's') 
+    {
+    	// si oui on enlève la dernière lettre (donc un le s) 
+        Singulier = strndup(Mot, strlen(Mot) -1);  
+        /* The  strdup() function returns a pointer to a new string which is a du‐
+       plicate of the string s.  Memory for the new string  is  obtained  with
+       malloc(3), and can be freed with free(3).
+       The strndup() function is similar, but copies at most n bytes.  If s is
+       longer than n, only n bytes are copied, and  a  terminating  null  byte
+       ('\0') is added.*/
+    }
+    else
+    {
         Singulier = strdup(Mot);
     }
     return Singulier;
